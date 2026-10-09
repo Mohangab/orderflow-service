@@ -24,6 +24,13 @@ spring:
     enabled: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.block.ms: 5000
 
 management:
   endpoints:
@@ -37,3 +44,11 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+app:
+  kafka:
+    order-events-topic: orders.events
+    partitions: 3
+  outbox:
+    poll-interval: 1s
+    send-timeout: 5s

@@ -6,6 +6,8 @@ import com.mohan.orderflow.api.dto.PageResponse;
 import com.mohan.orderflow.domain.Order;
 import com.mohan.orderflow.domain.OrderItem;
 import com.mohan.orderflow.domain.OrderStatus;
+import com.mohan.orderflow.event.OrderEventType;
+import com.mohan.orderflow.outbox.OutboxWriter;
 import com.mohan.orderflow.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +25,11 @@ public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
+    private final OutboxWriter outboxWriter;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, OutboxWriter outboxWriter) {
         this.orderRepository = orderRepository;
+        this.outboxWriter = outboxWriter;
     }
 
     @Transactional
@@ -34,6 +38,7 @@ public class OrderService {
                 .map(i -> new OrderItem(i.sku(), i.quantity(), i.unitPrice()))
                 .toList();
         Order order = orderRepository.save(Order.create(request.customerId(), items));
+        outboxWriter.append(OrderEventType.ORDER_CREATED, order, null);
         log.info("Created order {} for customer {} (total {})",
                 order.getId(), order.getCustomerId(), order.getTotalAmount());
         return OrderResponse.from(order);
@@ -62,7 +67,9 @@ public class OrderService {
     @Transactional
     public OrderResponse cancelOrder(UUID id, String reason) {
         Order order = findOrder(id);
-        order.cancel(reason == null || reason.isBlank() ? "Cancelled by customer" : reason);
+        String cancelReason = reason == null || reason.isBlank() ? "Cancelled by customer" : reason;
+        order.cancel(cancelReason);
+        outboxWriter.append(OrderEventType.ORDER_CANCELLED, order, cancelReason);
         log.info("Cancelled order {}", id);
         return OrderResponse.from(order);
     }
