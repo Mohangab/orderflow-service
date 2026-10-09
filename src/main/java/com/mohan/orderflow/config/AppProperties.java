@@ -13,7 +13,8 @@ public record AppProperties(
 
     public record Kafka(
             @DefaultValue("orders.events") String orderEventsTopic,
-            @DefaultValue("3") int partitions
+            @DefaultValue("3") int partitions,
+            @DefaultValue("orderflow-processing") String consumerGroup
     ) {
     }
 

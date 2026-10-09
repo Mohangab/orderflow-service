@@ -31,6 +31,12 @@ spring:
       properties:
         enable.idempotence: true
         max.block.ms: 5000
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        isolation.level: read_committed
 
 management:
   endpoints:
@@ -49,6 +55,12 @@ app:
   kafka:
     order-events-topic: orders.events
     partitions: 3
+    consumer-group: orderflow-processing
   outbox:
     poll-interval: 1s
     send-timeout: 5s
+  processing:
+    max-order-amount: 5000.00
+    max-quantity-per-sku: 100
+    out-of-stock-skus:
+      - SKU-OUT-OF-STOCK

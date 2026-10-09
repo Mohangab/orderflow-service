@@ -3,7 +3,11 @@ package com.mohan.orderflow.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import org.springframework.data.domain.Persistable;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -11,7 +15,7 @@ import java.util.UUID;
 /** Marker row used by the idempotent consumer to skip duplicate deliveries. */
 @Entity
 @Table(name = "processed_events")
-public class ProcessedEvent {
+public class ProcessedEvent implements Persistable<UUID> {
 
     @Id
     @Column(name = "event_id")
@@ -22,6 +26,26 @@ public class ProcessedEvent {
 
     @Column(name = "processed_at", nullable = false)
     private Instant processedAt;
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public UUID getId() {
+        return eventId;
+    }
+
+    /** Ids are assigned by the application, so tell Spring Data to INSERT instead of MERGE. */
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    void markNotNew() {
+        this.isNew = false;
+    }
 
     protected ProcessedEvent() {
         // JPA
