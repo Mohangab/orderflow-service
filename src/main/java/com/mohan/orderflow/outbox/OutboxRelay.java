@@ -42,7 +42,7 @@ public class OutboxRelay {
         this.props = props;
     }
 
-    @Scheduled(fixedDelayString = "${app.outbox.poll-interval:1s}")
+    @Scheduled(fixedDelayString = "${app.outbox.poll-interval:PT1S}")
     @Transactional
     public int relayPendingEvents() {
         List<OutboxEvent> pending = repository.findTop100ByPublishedAtIsNullOrderByCreatedAtAsc();

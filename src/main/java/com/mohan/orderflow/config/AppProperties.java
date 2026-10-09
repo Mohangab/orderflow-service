@@ -19,7 +19,7 @@ public record AppProperties(
     }
 
     public record Outbox(
-            @DefaultValue("1s") Duration pollInterval,
+            @DefaultValue("PT1S") Duration pollInterval,
             @DefaultValue("5s") Duration sendTimeout
     ) {
     }

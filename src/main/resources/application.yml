@@ -57,7 +57,7 @@ app:
     partitions: 3
     consumer-group: orderflow-processing
   outbox:
-    poll-interval: 1s
+    poll-interval: PT1S  # ISO-8601, also read by @Scheduled
     send-timeout: 5s
   processing:
     max-order-amount: 5000.00
