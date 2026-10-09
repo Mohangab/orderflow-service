@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Table(name = "order_items")
@@ -40,11 +41,11 @@ public class OrderItem {
     public OrderItem(String sku, int quantity, BigDecimal unitPrice) {
         this.sku = sku;
         this.quantity = quantity;
-        this.unitPrice = unitPrice;
+        this.unitPrice = unitPrice.setScale(2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal lineTotal() {
-        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+        return unitPrice.multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.HALF_UP);
     }
 
     void setOrder(Order order) {

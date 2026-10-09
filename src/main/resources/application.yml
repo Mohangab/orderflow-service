@@ -60,7 +60,7 @@ app:
     poll-interval: PT1S  # ISO-8601, also read by @Scheduled
     send-timeout: 5s
   processing:
-    max-order-amount: 5000.00
+    max-order-amount: "5000.00"
     max-quantity-per-sku: 100
     out-of-stock-skus:
       - SKU-OUT-OF-STOCK

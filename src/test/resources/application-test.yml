@@ -13,7 +13,7 @@ app:
   outbox:
     poll-interval: PT0.2S
   processing:
-    max-order-amount: 1000.00
+    max-order-amount: "1000.00"
     out-of-stock-skus:
       - SKU-OUT-OF-STOCK
 
